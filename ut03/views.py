@@ -1,8 +1,23 @@
 from django.shortcuts import render
+from .forms import CreaTableroForm
 
 #Create your views here
 def welcome(request):
     return render(request, 'ut03/index.html', {})
 
 def crea_tablero(request):
-    return render(request, 'ut03/crea_tablero.html', {})
+    #Si se ha enviado el formulario
+    if request.method == 'GET':
+        tablero_form = CreaTableroForm(request.GET)
+        #Ejecutamos a validacion
+        if tablero_form.is_valid():
+            #Los datos se cogen del diccionario cleaned_data
+            columnas = tablero_form.cleaned_data['columnas']
+            filas = tablero_form.cleaned_data['filas']
+
+            return render(request, 'ut03/muestra_tablero.html',
+                          {'filas':filas, 'columnas':columnas,
+                           'rango_filas':range(filas), 'rango_columnas':range(columnas)})
+    #Si se pide la página por primera vez
+    tablero_form = CreaTableroForm()
+    return render(request, 'ut03/crea_tablero.html', {'form':tablero_form})
